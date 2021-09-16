@@ -66,15 +66,16 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <slf4j.version>1.7.25</slf4j.version>
-        <kafka.version>2.1.0</kafka.version>
-        <confluent.version>5.1.0</confluent.version>
-        <confluent.patch.version>-cp1</confluent.patch.version>
-        <jackson.version>2.9.7</jackson.version>
-        <jackson.asl.version>1.9.13</jackson.asl.version>
+        <kafka.version>2.5.0</kafka.version>
+        <confluent.version>5.5.0</confluent.version>
+        <confluent.patch.version>-ccs</confluent.patch.version>
+<!--        <jackson.version>2.9.7</jackson.version>-->
+<!--        <jackson.version>2.10.2</jackson.version>-->
+<!--        <jackson.asl.version>1.9.13</jackson.asl.version>-->
 
         <spotless.version>1.19.0</spotless.version>
 
-        <shade.prefix>cricket.jmoore</shade.prefix>
+<!--        <shade.prefix>cricket.jmoore</shade.prefix>-->
     </properties>
 
     <dependencies>
@@ -90,14 +91,14 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-            <version>${kafka.version}${confluent.patch.version}</version>
+            <version>${confluent.version}${confluent.patch.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-transforms</artifactId>
-            <version>${kafka.version}${confluent.patch.version}</version>
+            <version>${confluent.version}${confluent.patch.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -129,26 +130,26 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--            <artifactId>jackson-databind</artifactId>-->
+<!--            <version>${jackson.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>${jackson.asl.version}</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.codehaus.jackson</groupId>-->
+<!--            <artifactId>jackson-core-asl</artifactId>-->
+<!--            <version>${jackson.asl.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jackson.asl.version}</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.codehaus.jackson</groupId>-->
+<!--            <artifactId>jackson-mapper-asl</artifactId>-->
+<!--            <version>${jackson.asl.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>com.thoughtworks.paranamer</groupId>
@@ -182,29 +183,33 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.8.1</version>
+<!--            <version>1.8.1</version>-->
+            <version>1.9.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
             <version>${confluent.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client</artifactId>
             <version>${confluent.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.kafka</groupId>
-                    <artifactId>kafka-clients</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>provided</scope>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.kafka</groupId>-->
+<!--                    <artifactId>kafka-clients</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--                    <artifactId>jackson-databind</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
 
         <!-- Test dependencies -->
@@ -269,20 +274,20 @@
                             </excludes>
                         </filter>
                     </filters>
-                    <relocations>
-                        <relocation>
-                            <pattern>io.confluent</pattern>
-                            <shadedPattern>${shade.prefix}.confluent</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.apache.avro</pattern>
-                            <shadedPattern>${shade.prefix}.avro</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>avro.shaded</pattern>
-                            <shadedPattern>${shade.prefix}.avroshaded</shadedPattern>
-                        </relocation>
-                    </relocations>
+<!--                    <relocations>-->
+<!--                        <relocation>-->
+<!--                            <pattern>io.confluent</pattern>-->
+<!--                            <shadedPattern>${shade.prefix}.confluent</shadedPattern>-->
+<!--                        </relocation>-->
+<!--                        <relocation>-->
+<!--                            <pattern>org.apache.avro</pattern>-->
+<!--                            <shadedPattern>${shade.prefix}.avro</shadedPattern>-->
+<!--                        </relocation>-->
+<!--                        <relocation>-->
+<!--                            <pattern>avro.shaded</pattern>-->
+<!--                            <shadedPattern>${shade.prefix}.avroshaded</shadedPattern>-->
+<!--                        </relocation>-->
+<!--                    </relocations>-->
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                     </transformers>

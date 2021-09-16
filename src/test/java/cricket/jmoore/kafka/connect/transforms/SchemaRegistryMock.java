@@ -9,13 +9,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.avro.Schema;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -123,7 +124,7 @@ public class SchemaRegistryMock implements BeforeEachCallback, AfterEachCallback
             throw new IllegalArgumentException("Role must be either SOURCE or DESTINATION");
         }
 
-        this.basicAuthTag = (role == Role.SOURCE) ? Constants.USE_BASIC_AUTH_SOURCE_TAG : Constants.USE_BASIC_AUTH_DEST_TAG; 
+        this.basicAuthTag = (role == Role.SOURCE) ? Constants.USE_BASIC_AUTH_SOURCE_TAG : Constants.USE_BASIC_AUTH_DEST_TAG;
         this.basicAuthCredentials =
             (role == Role.SOURCE)? Constants.HTTP_AUTH_SOURCE_CREDENTIALS_FIXTURE : Constants.HTTP_AUTH_DEST_CREDENTIALS_FIXTURE;
     }
@@ -156,19 +157,19 @@ public class SchemaRegistryMock implements BeforeEachCallback, AfterEachCallback
                 .willReturn(WireMock.aResponse().withStatus(HTTP_NOT_FOUND)));
     }
 
-    public int registerSchema(final String topic, boolean isKey, final Schema schema) {
+    public int registerSchema(final String topic, boolean isKey, final ParsedSchema schema) {
         return this.registerSchema(topic, isKey, schema, new TopicNameStrategy());
     }
 
-    public int registerSchema(final String topic, boolean isKey, final Schema schema, SubjectNameStrategy<Schema> strategy) {
+    public int registerSchema(final String topic, boolean isKey, final ParsedSchema schema, SubjectNameStrategy strategy) {
         return this.register(strategy.subjectName(topic, isKey, schema), schema);
     }
 
-    private int register(final String subject, final Schema schema) {
+    private int register(final String subject, final ParsedSchema schema) {
         try {
             final int id = this.schemaRegistryClient.register(subject, schema);
             this.stubFor.apply(WireMock.get(WireMock.urlEqualTo(SCHEMA_BY_ID_PATTERN + id))
-                    .willReturn(ResponseDefinitionBuilder.okForJson(new SchemaString(schema.toString()))));
+                    .willReturn(ResponseDefinitionBuilder.okForJson(new SchemaString(schema.rawSchema().toString()))));
             log.debug("Registered schema {}", id);
             return id;
         } catch (final IOException | RestClientException e) {
@@ -242,8 +243,8 @@ public class SchemaRegistryMock implements BeforeEachCallback, AfterEachCallback
                                             final FileSource files, final Parameters parameters) {
             try {
                 final int id = SchemaRegistryMock.this.register(getSubject(request),
-                        new Schema.Parser()
-                                .parse(RegisterSchemaRequest.fromJson(request.getBodyAsString()).getSchema()));
+                                                                new AvroSchema(RegisterSchemaRequest.fromJson(request.getBodyAsString()).getSchema())
+                );
                 final RegisterSchemaResponse registerSchemaResponse = new RegisterSchemaResponse();
                 registerSchemaResponse.setId(id);
                 return ResponseDefinitionBuilder.jsonResponse(registerSchemaResponse);
